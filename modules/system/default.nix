@@ -1,69 +1,36 @@
 {
   inputs,
   pkgs,
-  config,
   ...
-}: 
-let
-  quickshell = inputs.quickshell.packages.${pkgs.system}.default;
-in
-{
+}: {
   imports = [
     # ./example.nix - add your modules here
     inputs.nix-flatpak.nixosModules.nix-flatpak
-    inputs.sops-nix.nixosModules.sops
 
     ./aagl.nix
   ];
 
   environment.systemPackages = with pkgs; [
     inputs.jerry.packages.${pkgs.system}.default
-    (obs-studio.override {
-      cudaSupport = true;
-    })
-    (import ./quickshell.nix {
-      inherit symlinkJoin makeWrapper quickshell kdePackages lib;
-    })
-    atuin
-    aria2
-    nvidia-vaapi-driver
     sbctl
-    xsane
     waydroid-helper
     cloudflare-warp
-    ouch
+    unrar
     p7zip
-    ffmpeg-full
-    wineWowPackages.stable
+    python3Full
+    wine
     alejandra
     bat
-    nix-ld
-
-    python313Packages.aria2p
     # pkgs.vscode - hydenix's vscode version
     # pkgs.userPkgs.vscode - your personal nixpkgs version
   ];
-  
-  sops = {
-    defaultSopsFile = ./secrets/secrets.yaml;
-    defaultSopsFormat = "yaml";
-    age.keyFile = "/home/oxce5/.config/sops/age/keys.txt";
-    secrets."aria2_rpc" = { };
-  };
 
-  hardware.sane.enable = true; # enables support for SANE scanners
   hardware.graphics = {
     enable = true;
-    extraPackages = with pkgs; [
-      nvidia-vaapi-driver
-      ocl-icd
-    ];
   };
   hardware.nvidia = {
     open = false;
-    powerManagement.enable = true;
     powerManagement.finegrained = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
     prime = {
       offload = {
         enable = true;
@@ -73,8 +40,6 @@ in
       nvidiaBusId = "PCI:1:0:0";
     };
   };
-  services.xserver.videoDrivers = [ "nvidia" ];
-
   programs = {
     gamescope = {
       enable = true;
@@ -83,21 +48,6 @@ in
     steam = {
       enable = true;
       gamescopeSession.enable = true;
-      package = pkgs.steam.override {
-        extraPkgs = pkgs:
-          with pkgs; [
-            xorg.libXcursor
-            xorg.libXi
-            xorg.libXinerama
-            xorg.libXScrnSaver
-            libpng
-            libpulseaudio
-            libvorbis
-            stdenv.cc.cc.lib
-            libkrb5
-            keyutils
-          ];
-      };
     };
     nh = {
       enable = true;
@@ -105,40 +55,27 @@ in
       clean.extraArgs = "--keep-since 4d --keep 5";
       flake = "/home/oxce5/hydenix/";
     };
-    nix-ld = {
-      enable = true;
-      libraries = pkgs.steam-run.args.multiPkgs pkgs;
-    }; 
-    gamemode.enable = true;
   };
-
   services = {
     thermald.enable = true;
-    power-profiles-daemon.enable = true;
-    # auto-cpufreq.enable = true;
-    # auto-cpufreq.settings = {
-    #   battery = {
-    #     governor = "powersave";
-    #     turbo = "never";
-    #   };
-    #   charger = {
-    #     governor = "performance";
-    #     turbo = "auto";
-    #   };
-    # };
-    # tlp = {
-    #   enable = true;
-    #   settings.CPU_MAX_PERF_ON_BAT = 30;
-    #   settings.CPU_MAX_PERF_ON_AC = 100;
-    # };
+    auto-cpufreq.enable = true;
+    auto-cpufreq.settings = {
+      battery = {
+        governor = "powersave";
+        turbo = "never";
+      };
+      charger = {
+        governor = "performance";
+        turbo = "auto";
+      };
+    };
+    tlp = {
+      enable = true;
+      settings.CPU_MAX_PERF_ON_BAT = 30;
+    };
     undervolt = {
       enable = true;
       coreOffset = -125;
-    };
-    earlyoom = {
-      enable = true;
-      enableNotifications = true;
-      freeMemThreshold = 7;
     };
 
     deluge = {
@@ -147,23 +84,12 @@ in
       user = "oxce5";
     };
 
-    aria2 = {
-      enable = true;
-      openPorts = true;
-      rpcSecretFile = config.sops.secrets."aria2_rpc".path;
-      settings = {
-        enable-rpc = true;
-      };
-    };
-
     flatpak = {
       enable = true;
       packages = [
         "com.github.tchx84.Flatseal"
         "com.usebottles.bottles"
         "io.mrarm.mcpelauncher"
-        "org.vinegarhq.Vinegar"
-        "org.vinegarhq.Sober"
       ];
     };
     cron = {
@@ -195,7 +121,7 @@ in
   networking = {
     firewall = {
       enable = true;
-      allowedUDPPorts = [];
+      allowedUDPPorts = [19132 19133];
     };
   };
 
@@ -205,19 +131,9 @@ in
     enable = true;
     algorithm = "zstd";
     memoryPercent = 50;
-    priority = 80;
   };
-  swapDevices = [{
-    device = "/swapfile";
-    size = 10*1024;
-    priority = 30;
-    }];
   nix.settings = {
-    substituters = [
-      "https://ezkea.cachix.org"
-    ];
-    trusted-public-keys = [
-      "ezkea.cachix.org-1:ioBmUbJTZIKsHmWWXPe1FSFbeVe+afhfgqgTSNd34eI="
-    ];
+    substituters = ["https://ezkea.cachix.org"];
+    trusted-public-keys = ["ezkea.cachix.org-1:ioBmUbJTZIKsHmWWXPe1FSFbeVe+afhfgqgTSNd34eI="];
   };
 }

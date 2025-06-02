@@ -15,17 +15,12 @@
           transparent = true;
         };
 
-        lsp.enable = true;
         languages = {
+          enableLSP = true;
           enableTreesitter = true;
 
           nix.enable = true;
           python.enable = true;
-        };
-
-        clipboard = {
-          enable = true;
-          providers.wl-copy.enable = true;
         };
 
         statusline.lualine.enable = true;
@@ -38,6 +33,7 @@
         autopairs.nvim-autopairs.enable = true;
         lazy.enable = true;
         mini.ai = {enable = true;};
+        useSystemClipboard = true;
 
         utility = {
           surround.enable = true;
@@ -60,8 +56,6 @@
           };
         };
 
-        visuals.indent-blankline.enable = true;
-
         options = {
           tabstop = 2;
           shiftwidth = 2;
@@ -80,7 +74,6 @@
         luaConfigRC.tab = ''
           vim.opt.expandtab = true
           vim.opt.smartindent = true
-          vim.opt.clipboard = "unnamedplus"
         '';
       };
     };
