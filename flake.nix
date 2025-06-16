@@ -3,7 +3,7 @@
 
   inputs = {
     # User's nixpkgs - for user packages
-    nixpkgs.url = "github:NixOS/nixpkgs/42a1c966be226125b48c384171c44c651c236c22";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.11";
 
     jerry.url = "github:justchokingaround/jerry";
@@ -27,6 +27,15 @@
     hydenix = {
       url = "github:richen604/hydenix";
     };
+<<<<<<< HEAD
+=======
+    quickshell.url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
+    sops-nix = { 
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    zen-nebula.url = "github:JustAdumbPrsn/Nebula-A-Minimal-Theme-for-Zen-Browser";
+>>>>>>> 5d9f851 (add: hyprlock rice)
   };
 
   outputs = {nixpkgs, ...} @ inputs: let

@@ -100,7 +100,7 @@ in {
     nix.enable = true; # enable nix module
     sddm = {
       enable = true; # enable sddm module
-      theme = pkgs.hydenix.sddm-candy; # or pkgs.hydenix.sddm-corners
+      theme = "Candy"; # or pkgs.hydenix.sddm-corners
     };
     system.enable = true; # enable system module
   };
@@ -131,11 +131,40 @@ in {
   ];
 
   boot = {
+<<<<<<< HEAD
     loader.systemd-boot.enable = lib.mkForce false;
+=======
+    loader = {
+      timeout = 5;
+      systemd-boot.configurationLimit = 3;
+    };
+>>>>>>> 5d9f851 (add: hyprlock rice)
     lanzaboote = {
       enable = true;
       pkiBundle = "/var/lib/sbctl";
     };
     kernelModules = ["msr"];
+<<<<<<< HEAD
+=======
+    extraModulePackages = [ config.boot.kernelPackages.lenovo-legion-module ];
+    kernelParams = [
+      "quiet"
+      "splash"
+      "boot.shell_on_fail"
+      "udev.log_priority=3"
+      "rd.systemd.show_status=auto"
+    ];
+    plymouth = {
+      enable = true;
+    };
+    binfmt.registrations.appimage = {
+      wrapInterpreterInShell = false;
+      interpreter = "${pkgs.appimage-run}/bin/appimage-run";
+      recognitionType = "magic";
+      offset = 0;
+      mask = ''\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff'';
+      magicOrExtension = ''\x7fELF....AI\x02'';
+    };
+>>>>>>> 5d9f851 (add: hyprlock rice)
   };
 }
